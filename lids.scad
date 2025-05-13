@@ -7,6 +7,8 @@ ngon_points = 4;
 ngon_radius = 30;
 star_points = 10;
 star_inner_radius = 21.5;
+use_moon = false;
+moon_depth = 0.5;
 
 /* [Hidden] */
 cube_size = 50;
@@ -14,7 +16,8 @@ screw_diameter = 39.5;
 screw_depth = 16;
 screw_pitch = 4;
 lid_depth = 20;
-
+moon_radius = (screw_diameter-10)/2;
+    
 $fn = 256;
 
 module threads()
@@ -44,21 +47,36 @@ module ngon_lid(number_of_sides=6, radius=25)
     }
 }
 
-
-
-//star_lid(10);
-//ngon_lid(3, radius=43);
-//ngon_lid(4, radius=30);
-//ngon_lid(5, radius=26);
-//ngon_lid(6, radius=25);
-//ngon_lid(7, radius=23);
-//ngon_lid(8, radius=23);
-//ngon_lid(9, radius=23);
-if (lid_type == "star")
+module moon()
 {
-    star_lid(star_points);
+    moon_shift = moon_radius/1.25;
+    translate([moon_shift/4, 0, 0])
+    difference()
+    {
+        circle(r=moon_radius);
+        translate([moon_shift, 0, 0])
+            circle(r=moon_radius);
+    }
 }
-else if (lid_type == "ngon")
+
+//moon();
+
+
+difference()
 {
-    ngon_lid(ngon_points, ngon_radius);
+    if (lid_type == "star")
+    {
+        star_lid(star_points);
+    }
+    else if (lid_type == "ngon")
+    {
+        ngon_lid(ngon_points, ngon_radius);
+    }
+    
+    if (use_moon)
+    {
+        translate([0, 0, lid_depth-moon_depth])
+            #linear_extrude(moon_depth)
+                moon();
+    }
 }
